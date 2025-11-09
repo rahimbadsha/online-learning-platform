@@ -22,22 +22,76 @@ app.get("/", (req, res) => {
 // MongoDB connection
 async function run() {
   try {
+    // Connect to MongoDB Atlas
     await client.connect();
 
+    // Select database
     const db = client.db("onlineLearningDB");
     const coursesCollection = db.collection("courses");
 
-    app.post("/courses", async(req, res) => {
-        const course = req.body;
-        const result = await coursesCollection.insertOne(course);
-        res.send(result)
-    })
-
-    app.get("/courses", async(req, res) => {
+    // Get all courses /courses
+    app.get('/courses', async (req, res) => {
         const cursor = coursesCollection.find();
         const result = await cursor.toArray();
-        res.send(result)
-    })
+        res.send(result);
+    });
+
+    // Get a single course by ID /courses/:id
+    app.get('/courses/:id', async (req, res) => {
+        const id = req.params.id; //getting id from url
+        const query = { _id: new ObjectId(id) };
+        const result = await coursesCollection.findOne(query);
+        res.send(result);
+    });
+
+
+    // Add a new course /courses
+    app.post('/courses', async (req, res) => {
+        const newCourse = req.body; 
+        const result = await coursesCollection.insertOne(newCourse);
+        res.send(result);
+    });
+
+    // Update a course by ID /courses/:id
+    app.patch('/courses/:id', async(req, res)) => {
+        const id = req.params.id;
+        const updatedCourse = req.body;
+        const filter = { _id: new ObjectId(id) };
+        const updateDoc = {
+            $set: updatedCourse,
+        };
+        const result = await coursesCollection.updateOne(filter, updateDoc);
+        res.send(result);
+    }
+
+    // Delete a course by ID /courses/:id
+    app.delete('/courses/:id', async (req, res) => {
+        const id = req.params.id;
+        const query = { _id: new ObjectId(id) };
+        const result = await coursesCollection.deleteOne(query);
+        res.send(result);
+    });
+
+    // Get courses by enrolled user email /my-enrolled-courses
+    app.get('/my-enrolled-courses', async (req, res) => {
+        const email = req.query.email; 
+        const query = { enrolledUsers: email }; 
+        const cursor = coursesCollection.find(query);
+        const result = await cursor.toArray();
+        res.send(result);
+    });
+
+    // Get courses by instructor email /my-courses
+    app.get('/my-courses', async (req, res) => {
+        const email = req.query.email; // instructor email
+        const query = { instructorEmail: email };
+        const cursor = coursesCollection.find(query);
+        const result = await cursor.toArray();
+        res.send(result);
+    });
+
+
+
 
 
 
