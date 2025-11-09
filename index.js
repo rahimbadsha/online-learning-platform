@@ -23,9 +23,34 @@ app.get("/", (req, res) => {
 async function run() {
   try {
     await client.connect();
+
+    const db = client.db("onlineLearningDB");
+    const coursesCollection = db.collection("courses");
+
+    app.post("/courses", async(req, res) => {
+        const course = req.body;
+        const result = await coursesCollection.insertOne(course);
+        res.send(result)
+    })
+
+    app.get("/courses", async(req, res) => {
+        const cursor = coursesCollection.find();
+        const result = await cursor.toArray();
+        res.send(result)
+    })
+
+
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
+
+
+
+    // routes
+    app.get("/courses", async(req, res) => {
+
+    })
 
    
   } finally {
