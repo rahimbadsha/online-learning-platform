@@ -93,7 +93,7 @@ async function run() {
     });
 
     // Update a course by ID /courses/:id
-    app.patch('/courses/:id', async(req, res) => {
+    app.patch('/update-course/:id', async(req, res) => {
         const id = req.params.id;
         const updatedCourse = req.body;
         const filter = { _id: new ObjectId(id) };
