@@ -84,6 +84,22 @@ async function run() {
         res.send(result);
     });
 
+    // Get a Popular course by rating /popular-courses/:id
+    app.get("/popular-courses", async (req, res) => {
+    try {
+        const cursor = coursesCollection
+        .find({ isFeatured: true })      
+        .sort({ rating: -1 })            
+        .limit(6);                      
+
+        const result = await cursor.toArray();
+        res.send(result);
+    } catch (error) {
+        console.error("Error fetching popular courses:", error);
+        res.send({ message: "Failed to fetch popular courses" });
+    }
+    });
+
 
     // Add a new course /courses
     app.post('/courses', async (req, res) => {
@@ -92,7 +108,7 @@ async function run() {
         res.send(result);
     });
 
-    // Update a course by ID /courses/:id
+    // Update a course by ID /update-course/:id
     app.patch('/update-course/:id', async(req, res) => {
         const id = req.params.id;
         const updatedCourse = req.body;
@@ -104,7 +120,7 @@ async function run() {
         res.send(result);
     });
 
-    // Delete a course by ID /courses/:id
+    // Delete a course by ID /delete-course/:id
     app.delete('/delete-course/:id', async (req, res) => {
         const id = req.params.id;
         const query = { _id: new ObjectId(id) };
