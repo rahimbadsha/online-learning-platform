@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const client = require("./db/connectDB");
+const { ObjectId } = require('mongodb');
 
 dotenv.config();
 
@@ -28,7 +29,46 @@ async function run() {
     // Select database
     const db = client.db("onlineLearningDB");
     const coursesCollection = db.collection("courses");
+    const usersCollection = db.collection("users"); 
 
+    // ======================
+    //  USERS ROUTES
+    // ======================
+     // Add a new user (Register)
+    app.post("/users", async (req, res) => {
+      try {
+        const user = req.body;
+
+        // Check if user already exists
+        const existingUser = await usersCollection.findOne({ email: user.email });
+        if (existingUser) {
+          return res.send({ message: "User already exists" });
+        }
+
+        const result = await usersCollection.insertOne(user);
+        res.send(result);
+      } catch (error) {
+        console.error("Error saving user:", error);
+        res.send({ message: "Error saving user" });
+      }
+    });
+
+    // Get all users
+    app.get("/users", async (req, res) => {
+      const users = await usersCollection.find().toArray();
+      res.send(users);
+    });
+
+    // Get single user by email
+    app.get("/users/:email", async (req, res) => {
+      const email = req.params.email;
+      const user = await usersCollection.findOne({ email });
+      res.send(user);
+    });
+
+    // ======================
+    //  COURSE ROUTES
+    // ======================
     // Get all courses /courses
     app.get('/courses', async (req, res) => {
         const cursor = coursesCollection.find();
@@ -53,7 +93,7 @@ async function run() {
     });
 
     // Update a course by ID /courses/:id
-    app.patch('/courses/:id', async(req, res)) => {
+    app.patch('/courses/:id', async(req, res) => {
         const id = req.params.id;
         const updatedCourse = req.body;
         const filter = { _id: new ObjectId(id) };
@@ -62,7 +102,7 @@ async function run() {
         };
         const result = await coursesCollection.updateOne(filter, updateDoc);
         res.send(result);
-    }
+    });
 
     // Delete a course by ID /courses/:id
     app.delete('/courses/:id', async (req, res) => {
@@ -81,7 +121,7 @@ async function run() {
         res.send(result);
     });
 
-    // Get courses by instructor email /my-courses
+    
     app.get('/my-courses', async (req, res) => {
         const email = req.query.email; // instructor email
         const query = { instructorEmail: email };
