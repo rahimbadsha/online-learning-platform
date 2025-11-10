@@ -105,7 +105,7 @@ async function run() {
     });
 
     // Delete a course by ID /courses/:id
-    app.delete('/courses/:id', async (req, res) => {
+    app.delete('/delete-course/:id', async (req, res) => {
         const id = req.params.id;
         const query = { _id: new ObjectId(id) };
         const result = await coursesCollection.deleteOne(query);
