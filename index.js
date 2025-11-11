@@ -59,12 +59,30 @@ async function run() {
       res.send(users);
     });
 
+    // get top 3 users by ratings
+    app.get("/top-instructors", async (req, res) => {
+      try {
+        const cursor = usersCollection
+          .find() 
+          .sort({ rating: -1 })            
+          .limit(3);                      
+
+        const result = await cursor.toArray();
+        res.send(result);
+      } catch (error) {
+        console.error("Error fetching top instructors:", error);
+        res.send({ message: "Failed to fetch top instructors" });
+      }
+    });
+
     // Get single user by email
     app.get("/users/:email", async (req, res) => {
       const email = req.params.email;
       const user = await usersCollection.findOne({ email });
       res.send(user);
     });
+
+    
 
     // ======================
     //  COURSE ROUTES
