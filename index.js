@@ -71,7 +71,7 @@ async function run() {
     // ======================
     // Get all courses /courses
     app.get('/courses', async (req, res) => {
-        const cursor = coursesCollection.find();
+        const cursor = coursesCollection.find().sort({createdAt: -1});
         const result = await cursor.toArray();
         res.send(result);
     });
