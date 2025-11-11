@@ -140,8 +140,8 @@ async function run() {
     
     app.get('/my-courses', async (req, res) => {
         const email = req.query.email; // instructor email
-        const query = { instructorEmail: email };
-        const cursor = coursesCollection.find(query);
+        const query = { "instructor.email": email };
+        const cursor = coursesCollection.find(query).sort({ createdAt: -1});
         const result = await cursor.toArray();
         res.send(result);
     });
