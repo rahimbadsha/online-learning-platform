@@ -59,7 +59,7 @@ async function run() {
       res.send(users);
     });
 
-    // get top 3 users by ratings
+    // get top 3 users by ratings /top-instructors
     app.get("/top-instructors", async (req, res) => {
       try {
         const cursor = usersCollection
@@ -163,10 +163,6 @@ async function run() {
         const result = await cursor.toArray();
         res.send(result);
     });
-
-
-
-
 
 
     // Send a ping to confirm a successful connection
